@@ -4,37 +4,42 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-import time
+from selenium.common.exceptions import TimeoutException
+import time, unittest
 
 
-class Set_Up_For_127(object):
-	driver = webdriver.Firefox()
-	driver.get('http://10.32.200.127')
-	driver.find_element_by_id('Login').send_keys('admin')
-	driver.find_element_by_id('Password').send_keys('77@dm1n')
-	submit = driver.find_element_by_class_name('submit')
-	submit.click()
-	WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".donor-logo")))
+class Test_CreateDonor(unittest.TestCase):
 
+	def setUp(self):
+		self.driver = webdriver.Firefox()
+		self.driver.get('http://10.32.200.127')
+		self.driver.find_element_by_id('Login').send_keys('admin')
+		self.driver.find_element_by_id('Password').send_keys('77@dm1n')
+		submit = self.driver.find_element_by_class_name('submit')
+		submit.click()
+		WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".donor-logo")))
 
-class Create(Set_Up_For_127):
-	def __init__(self, lastname, firstname):
+	def test_create(self, lastname = 'Уколов', firstname = 'Павел'):
+		driver = self.driver
+		wait = WebDriverWait(driver, 20)
 		self.lastname = lastname
 		self.firstname = firstname
-		Set_Up_For_127.driver.get('http://10.32.200.127/donor')
-		#time.sleep(5)
-		elementnewd = WebDriverWait(Set_Up_For_127.driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='newdonor']")))
+		driver.get('http://10.32.200.127/donor')
+		elementnewd = wait.until(EC.element_to_be_clickable((By.XPATH, ".//*[@id='newdonor']")))
 		elementnewd.click()
 		#WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "LastName")))
-		LastName = WebDriverWait(Set_Up_For_127.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='LastName']")))
+		LastName = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='LastName']")))
 		LastName.send_keys(self.lastname)
-		FirstName = Set_Up_For_127.driver.find_element_by_id('FirstName')
+		FirstName = driver.find_element_by_id('FirstName')
 		FirstName.send_keys(self.firstname)
-		Set_Up_For_127.driver.find_element_by_id('BirthDate').send_keys('11021990')
-		Set_Up_For_127.driver.find_element_by_id('Gender').click()
-		Set_Up_For_127.driver.find_element_by_id('IdentityDocument_Serie').send_keys('0956980716')
-		Set_Up_For_127.driver.find_element_by_id('IdentityDocument_IssueDate').send_keys('09032010')
-		Set_Up_For_127.driver.find_element_by_id('NextStep').click()
+		driver.find_element_by_id('BirthDate').send_keys('11021990')
+		driver.find_element_by_id('Gender').click()
+		driver.find_element_by_id('IdentityDocument_Serie').send_keys('0956980716')
+		driver.find_element_by_id('IdentityDocument_IssueDate').send_keys('09032010')
+		driver.find_element_by_id('NextStep').click()
+
+if __name__ == '__main__':
+	unittest.main()
 
 	#def create_donor_second_page():
 		#time.sleep(5)
