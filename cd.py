@@ -43,8 +43,6 @@ class Create(Set_Up_For_127):
 	"""
 	Выяснить, почему обваливается ошибка при ожидании средствами селениума. WebDriverWait не исполняется. ELEMENT IS NOT VISIBLE; XPATH STR IS NOT CALLABLE.
 
-	Позже, когда всё заработает функционально, свести к ООП.
-
 	http://automated-testing.info/t/otlichie-find-element-ot-presence-of-element-located/4250/11 - здесь
 	http://stackoverflow.com/questions/27927964/selenium-element-not-visible-exception
 	http://selenium-python.readthedocs.io/waits.html
