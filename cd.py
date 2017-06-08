@@ -19,16 +19,17 @@ class Test_CreateDonor(unittest.TestCase):
 		submit.click()
 		WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".donor-logo")))
 
-	def test_create(self, lastname = 'Уколов', firstname = 'Павел'):
+	def test_create(self, lastname = 'Мэттерз', firstname = 'Маршал'):
 		driver = self.driver
-		wait = WebDriverWait(driver, 20)
+		wait = WebDriverWait(driver, 10)
 		self.lastname = lastname
 		self.firstname = firstname
 		driver.get('http://10.32.200.127/donor')
-		elementnewd = wait.until(EC.element_to_be_clickable((By.XPATH, ".//*[@id='newdonor']")))
-		elementnewd.click()
-		#WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "LastName")))
-		LastName = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='LastName']")))
+		wait.until(EC.element_to_be_clickable((By.XPATH, ".//*[@id='newdonor']")))
+		driver.find_element_by_xpath(".//*[@id='newdonor']").click()
+		#Добавить assert
+		#LastName = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='LastName']")))
+		LastName = driver.find_element_by_id('LastName')
 		LastName.send_keys(self.lastname)
 		FirstName = driver.find_element_by_id('FirstName')
 		FirstName.send_keys(self.firstname)
@@ -37,21 +38,11 @@ class Test_CreateDonor(unittest.TestCase):
 		driver.find_element_by_id('IdentityDocument_Serie').send_keys('0956980716')
 		driver.find_element_by_id('IdentityDocument_IssueDate').send_keys('09032010')
 		driver.find_element_by_id('NextStep').click()
+		#Добавить assert
+
+	def tearDown(self):
+		self.driver.quit()
+
 
 if __name__ == '__main__':
 	unittest.main()
-
-	#def create_donor_second_page():
-		#time.sleep(5)
-		#region = driver.find_element_by_id('regFiasAddress_Region')
-		#region.send_keys('Москва')
-	"""
-	Выяснить, почему обваливается ошибка при ожидании средствами селениума. WebDriverWait не исполняется. ELEMENT IS NOT VISIBLE; XPATH STR IS NOT CALLABLE.
-
-	http://automated-testing.info/t/otlichie-find-element-ot-presence-of-element-located/4250/11 - здесь
-	http://stackoverflow.com/questions/27927964/selenium-element-not-visible-exception
-	http://selenium-python.readthedocs.io/waits.html
-	https://iamalittletester.wordpress.com/2016/05/11/selenium-how-to-wait-for-an-element-to-be-displayed-not-displayed/
-	https://blog.mozilla.org/webqa/2012/07/12/how-to-webdriverwait/
-
-	"""
