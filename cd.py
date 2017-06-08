@@ -8,6 +8,7 @@ from selenium.common.exceptions import TimeoutException
 import time, unittest
 
 
+
 class Test_CreateDonor(unittest.TestCase):
 
 	def setUp(self):
@@ -19,16 +20,17 @@ class Test_CreateDonor(unittest.TestCase):
 		submit.click()
 		WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".donor-logo")))
 
-	def test_create(self, lastname = 'Уколов', firstname = 'Павел'):
+	def test_create(self, lastname = 'Мэттерз', firstname = 'Маршал'):
 		driver = self.driver
-		wait = WebDriverWait(driver, 20)
+		wait = WebDriverWait(driver, 10)
 		self.lastname = lastname
 		self.firstname = firstname
 		driver.get('http://10.32.200.127/donor')
-		elementnewd = wait.until(EC.element_to_be_clickable((By.XPATH, ".//*[@id='newdonor']")))
-		elementnewd.click()
-		#WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "LastName")))
-		LastName = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='LastName']")))
+		wait.until(EC.element_to_be_clickable((By.XPATH, ".//*[@id='newdonor']")))
+		driver.find_element_by_xpath(".//*[@id='newdonor']").click()
+		#Добавить assert
+		#LastName = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='LastName']")))
+		LastName = driver.find_element_by_id('LastName')
 		LastName.send_keys(self.lastname)
 		FirstName = driver.find_element_by_id('FirstName')
 		FirstName.send_keys(self.firstname)
@@ -37,6 +39,10 @@ class Test_CreateDonor(unittest.TestCase):
 		driver.find_element_by_id('IdentityDocument_Serie').send_keys('0956980716')
 		driver.find_element_by_id('IdentityDocument_IssueDate').send_keys('09032010')
 		driver.find_element_by_id('NextStep').click()
+		#Добавить assert
+
+	def tearDown(self):
+		self.driver.quit()
 
 if __name__ == '__main__':
 	unittest.main()
