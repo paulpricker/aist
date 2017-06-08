@@ -8,6 +8,7 @@ from selenium.common.exceptions import TimeoutException
 import time, unittest
 
 
+
 class Test_CreateDonor(unittest.TestCase):
 
 	def setUp(self):
@@ -39,6 +40,12 @@ class Test_CreateDonor(unittest.TestCase):
 		driver.find_element_by_id('IdentityDocument_IssueDate').send_keys('09032010')
 		driver.find_element_by_id('NextStep').click()
 		#Добавить assert
+<<<<<<< HEAD
+=======
+
+	def tearDown(self):
+		self.driver.quit()
+>>>>>>> 71066111c62b2b6e84e7b05e405335a76f115b29
 
 	def tearDown(self):
 		self.driver.quit()
