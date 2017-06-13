@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import time, unittest
+from selenium.webdriver.support.ui import Select
 
 
 
@@ -29,7 +30,6 @@ class Test_CreateDonor(unittest.TestCase):
 		first = driver.find_element_by_id('FirstName')
 		wait.until(EC.element_to_be_clickable((By.XPATH, ".//*[@id='newdonor']")))
 		newdonor.click()
-		#Добавить assert
 		wait.until(EC.presence_of_element_located((By.XPATH, "//*[@id='LastName']"))) #or element_to_be_clickable
 		last.send_keys('Уколов')
 		first.send_keys('Павел')
@@ -39,6 +39,9 @@ class Test_CreateDonor(unittest.TestCase):
 		driver.find_element_by_id('IdentityDocument_IssueDate').send_keys('09032010')
 		driver.find_element_by_id('NextStep').click()
 		#Добавить assert
+		#http://software-testing.ru/forum/index.php?/topic/28840-problemy-s-select-vypadaiuschij-spisok/
+		driver.find_element_by_id('regFiasAddress_Region').send_keys('Мос')
+		driver.find_element_by_id('regFiasAddress_Region_listbox').Select(driver.find_element_by_xpath('/html/body/div[84]/div/div[2]/ul/li[2]'))
 
 	def tearDown(self):
 		self.driver.quit()
