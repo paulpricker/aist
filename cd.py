@@ -35,7 +35,8 @@ class Test_CreateDonor(unittest.TestCase):
 		newdonor = driver.find_element_by_xpath(".//*[@id='newdonor']")
 		newdonor.click()
 		wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="LastName"]')))
-		#Добавить TimeOut Exeption
+		if driver.find_element_by_xpath('//*[@id="LastName"]').is_displayed() != True:
+			newdonor.click()
 		ln = "Машинный"
 		fn = "Яша"
 		mn = "Афанасьевич"
