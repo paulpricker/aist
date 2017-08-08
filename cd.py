@@ -1,4 +1,4 @@
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import selenium
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -8,7 +8,6 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import time, unittest
 from selenium.webdriver.support.ui import Select
-
 
 
 class Test_CreateDonor(unittest.TestCase):
@@ -31,16 +30,18 @@ class Test_CreateDonor(unittest.TestCase):
 		driver = self.driver
 		wait = WebDriverWait(driver, 20)
 		driver.get('http://10.32.200.127/donor')
-		wait.until(EC.element_to_be_clickable((By.XPATH, ".//*[@id='newdonor']")))
+		wait.until(EC.presence_of_element_located((By.XPATH, ".//*[@id='newdonor']")))
 		newdonor = driver.find_element_by_xpath(".//*[@id='newdonor']")
 		newdonor.click()
+		newdonor.click()
 		wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="LastName"]')))
-		if driver.find_element_by_xpath('//*[@id="LastName"]').is_displayed() != True:
-			newdonor.click()
+		'''if driver.find_element_by_xpath('//*[@id="LastName"]').is_displayed() != True:
+			newdonor.click()'''
+		#Добавить TimeOut Exception
 		ln = "Машинный"
 		fn = "Яша"
 		mn = "Афанасьевич"
-		full_name = ln + fn + mn
+		full_name = ln + ' ' + fn + ' ' + mn
 		last = driver.find_element_by_xpath('//*[@id="LastName"]')
 		first = driver.find_element_by_id('FirstName')
 		middle = driver.find_element_by_id('MiddleName')
@@ -56,8 +57,8 @@ class Test_CreateDonor(unittest.TestCase):
 		'''Проверка валидации выбранного пола'''
 
 		wait.until(EC.presence_of_element_located((By.ID, "confirm-popup_wnd_title")))
-		sex_popup = driver.find_element_by_id('confirm-popup_wnd_title')
-		assert sex_popup.text != "Пол донора не соответствует отчеству. Вы уверены?"
+		sex_popup = driver.find_element_by_id('confirm-popup')
+		self.assertEqual(sex_popup.text, "Пол донора не соответствует отчеству. Вы уверены?")
 		driver.find_element_by_xpath('//*[@id="confirm-popup-no"]').click()
 		driver.find_element_by_id('NextStep').click()
 
@@ -74,7 +75,9 @@ class Test_CreateDonor(unittest.TestCase):
 		select_region.click()
 		time.sleep(2)
 		#assert save_button.click()
-		driver.find_element_by_xpath('//*[@id="regFiasAddress_Street"]').send_keys('Строит')
+		select_street = driver.find_element_by_xpath('//*[@id="regFiasAddress_Street"]')
+		select_street.click()
+		select_street.send_keys('Строит')
 		wait.until(EC.text_to_be_present_in_element((By.XPATH, '//*[@id="regFiasAddress_Street_listbox"]/li[2]'), 'Строителей ул'))
 		#assert save_button.click()
 		driver.find_element_by_xpath('//*[@id="regFiasAddress_Street_listbox"]/li[2]').click()
@@ -82,21 +85,20 @@ class Test_CreateDonor(unittest.TestCase):
 		driver.find_element_by_xpath('//*[@id="regFiasAddress_House"]').send_keys('13')
 		time.sleep(2)
 		save_button.click()
-		save_button.click()
-		save_button.click()
-		time.sleep(2)
+		save_button.click() #потом добавить клик по пустому полю вместо второго клика на кнопку
+		time.sleep(6)
 
 		'''Проверка сохранения'''
 		
 		wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="SimpleSearchText"]')))
-		search = driver.find_element_by_xpath('//*[@id="SimpleSearchText"]').text
-		if search == full_name:
-			newdonor = driver.find_element_by_xpath(".//*[@id='newdonor']")
-			newdonor.click()
+		search_minicard = driver.find_element_by_xpath('//*[@id="donor-details"]/div[1]/div[5]/div[2]/a').text
+		search_grid = driver.find_element_by_xpath('/html/body/div[4]/div[4]/div/div[1]/div/div[2]/div[1]/table/tbody/tr[1]/td[2]').text
+		self.assertEqual(search_minicard, full_name)
+		self.assertEqual(search_grid, full_name)
 
 
-	'''def tearDown(self):
-		self.driver.quit()'''
+	def tearDown(self):
+		self.driver.quit()
 
 if __name__ == '__main__':
 	unittest.main()
