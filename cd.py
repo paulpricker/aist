@@ -12,77 +12,85 @@ from selenium.webdriver.support.ui import Select
 
 class Test_CreateDonor(unittest.TestCase):
 
-	def setUp(self):
-		'''Переход на страницу и логин'''
-		self.driver = webdriver.Firefox()
-		self.driver.get('http://10.32.200.127')
-		self.driver.find_element_by_id('Login').send_keys('admin')
-		self.driver.find_element_by_id('Password').send_keys('77@dm1n')
-		submit = self.driver.find_element_by_class_name('submit')
-		submit.click()
-		WebDriverWait(self.driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".donor-logo")))
-		# добавить assert
+	@classmethod
+	def setUpClass(cls):
 
-	def test_create(self):
+		'''Переход на страницу и логин'''
+
+		cls.driver = webdriver.Firefox()
+		cls.driver.maximize_window()
+		cls.driver.get('http://10.32.200.127')
+		cls.driver.find_element_by_id('Login').send_keys('admin')
+		cls.driver.find_element_by_id('Password').send_keys('77@dm1n')
+		submit = cls.driver.find_element_by_class_name('submit')
+		submit.click()
+		cls.wait = WebDriverWait(cls.driver, 20)
+		cls.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".donor-logo")))
+
+	def test_create_first_page(self):
 
 		'''Проверка первой страницы pop-up'а'''
 
-		driver = self.driver
-		wait = WebDriverWait(driver, 20)
-		driver.get('http://10.32.200.127/donor')
-		wait.until(EC.presence_of_element_located((By.XPATH, ".//*[@id='newdonor']")))
-		newdonor = driver.find_element_by_xpath(".//*[@id='newdonor']")
+		self.driver.get('http://10.32.200.127/donor')
+		self.wait.until(EC.presence_of_element_located((By.XPATH, ".//*[@id='newdonor']")))
+		newdonor = self.driver.find_element_by_xpath(".//*[@id='newdonor']")
 		newdonor.click()
 		newdonor.click()
-		wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="LastName"]')))
+		self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="LastName"]')))
 		'''if driver.find_element_by_xpath('//*[@id="LastName"]').is_displayed() != True:
 			newdonor.click()'''
 		#Добавить TimeOut Exception
-		ln = "Машинный"
-		fn = "Яша"
-		mn = "Афанасьевич"
+		ln = "машинный"
+		fn = "яша"
+		mn = "афанасьевич"
+		global full_name 
 		full_name = ln + ' ' + fn + ' ' + mn
-		last = driver.find_element_by_xpath('//*[@id="LastName"]')
-		first = driver.find_element_by_id('FirstName')
-		middle = driver.find_element_by_id('MiddleName')
+		last = self.driver.find_element_by_xpath('//*[@id="LastName"]')
+		first = self.driver.find_element_by_id('FirstName')
+		middle = self.driver.find_element_by_id('MiddleName')
+		save_button = self.driver.find_element_by_id('NextStep')
+		save_button.click()
+		[@id='newdonor-popup-form']/div/div[1]/ul/li[1]
 		last.send_keys(ln)
 		first.send_keys(fn)
 		middle.send_keys(mn)
-		driver.find_element_by_id('BirthDate').send_keys('11021990')
-		driver.find_element_by_xpath('//*[@id="step1"]/div[4]/label[2]').click()
-		driver.find_element_by_id('IdentityDocument_Serie').send_keys('0956980716')
-		driver.find_element_by_id('IdentityDocument_IssueDate').send_keys('09032010')
-		driver.find_element_by_id('NextStep').click()
+		self.driver.find_element_by_id('BirthDate').send_keys('11021990')
+		self.driver.find_element_by_xpath('//*[@id="step1"]/div[4]/label[2]').click()
+		self.driver.find_element_by_id('IdentityDocument_Serie').send_keys('0956980716')
+		self.driver.find_element_by_id('IdentityDocument_IssueDate').send_keys('09032010')
+		save_button.click()
 
+		'''Обработать все предупреждающие и запрещающие проверки в отдельном тест-кейсе'''
+		
 		'''Проверка валидации выбранного пола'''
-
-		wait.until(EC.presence_of_element_located((By.ID, "confirm-popup_wnd_title")))
-		sex_popup = driver.find_element_by_id('confirm-popup')
+		self.wait.until(EC.presence_of_element_located((By.ID, "confirm-popup_wnd_title")))
+		sex_popup = self.driver.find_element_by_id('confirm-popup')
 		self.assertEqual(sex_popup.text, "Пол донора не соответствует отчеству. Вы уверены?")
-		driver.find_element_by_xpath('//*[@id="confirm-popup-no"]').click()
-		driver.find_element_by_id('NextStep').click()
+		self.driver.find_element_by_xpath('//*[@id="confirm-popup-no"]').click()
+		self.driver.find_element_by_id('NextStep').click()
 
 		'''Проверка второй страницы pop-up'а'''
 
-		wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='regFiasAddress_Region']")))
-		assert "Контактная информация" not in driver.find_element_by_xpath('//*[@id="step2"]/div[1]').text
-		assert driver.find_element_by_xpath('//*[@id="regFiasAddress_Street"]').is_enabled() == False #get_attribute('disabled') == True
-		save_button = driver.find_element_by_xpath('//*[@id="save-newdonor"]')
+	def test_create_second_page(self):
+		self.wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='regFiasAddress_Region']")))
+		self.assertEqual(self.driver.find_element_by_xpath('//*[@id="step2"]/div[1]').text, "Контактная информация")
+		assert self.driver.find_element_by_xpath('//*[@id="regFiasAddress_Street"]').is_enabled() == False #get_attribute('disabled') == True
+		save_button = self.driver.find_element_by_xpath('//*[@id="save-newdonor"]')
 		#assert save_button.click()
-		driver.find_element_by_id('regFiasAddress_Region').send_keys('Мос')
-		wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="regFiasAddress_Region_listbox"]/li[1]')))
-		select_region = driver.find_element_by_xpath('//*[@id="regFiasAddress_Region_listbox"]/li[1]')
+		self.driver.find_element_by_id('regFiasAddress_Region').send_keys('Мос')
+		self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="regFiasAddress_Region_listbox"]/li[1]')))
+		select_region = self.driver.find_element_by_xpath('//*[@id="regFiasAddress_Region_listbox"]/li[1]')
 		select_region.click()
 		time.sleep(2)
 		#assert save_button.click()
-		select_street = driver.find_element_by_xpath('//*[@id="regFiasAddress_Street"]')
+		select_street = self.driver.find_element_by_xpath('//*[@id="regFiasAddress_Street"]')
 		select_street.click()
 		select_street.send_keys('Строит')
-		wait.until(EC.text_to_be_present_in_element((By.XPATH, '//*[@id="regFiasAddress_Street_listbox"]/li[2]'), 'Строителей ул'))
+		self.wait.until(EC.text_to_be_present_in_element((By.XPATH, '//*[@id="regFiasAddress_Street_listbox"]/li[2]'), 'Строителей ул'))
 		#assert save_button.click()
-		driver.find_element_by_xpath('//*[@id="regFiasAddress_Street_listbox"]/li[2]').click()
+		self.driver.find_element_by_xpath('//*[@id="regFiasAddress_Street_listbox"]/li[2]').click()
 		time.sleep(2)
-		driver.find_element_by_xpath('//*[@id="regFiasAddress_House"]').send_keys('13')
+		self.driver.find_element_by_xpath('//*[@id="regFiasAddress_House"]').send_keys('13')
 		time.sleep(2)
 		save_button.click()
 		save_button.click() #потом добавить клик по пустому полю вместо второго клика на кнопку
@@ -90,15 +98,15 @@ class Test_CreateDonor(unittest.TestCase):
 
 		'''Проверка сохранения'''
 		
-		wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="SimpleSearchText"]')))
-		search_minicard = driver.find_element_by_xpath('//*[@id="donor-details"]/div[1]/div[5]/div[2]/a').text
-		search_grid = driver.find_element_by_xpath('/html/body/div[4]/div[4]/div/div[1]/div/div[2]/div[1]/table/tbody/tr[1]/td[2]').text
+		self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="SimpleSearchText"]')))
+		search_minicard = self.driver.find_element_by_xpath('//*[@id="donor-details"]/div[1]/div[5]/div[2]/a').text
+		search_grid = self.driver.find_element_by_xpath('/html/body/div[4]/div[4]/div/div[1]/div/div[2]/div[1]/table/tbody/tr[1]/td[2]').text
 		self.assertEqual(search_minicard, full_name)
 		self.assertEqual(search_grid, full_name)
 
-
-	def tearDown(self):
-		self.driver.quit()
+	@classmethod
+	def tearDownClass(cls):
+		cls.driver.quit()
 
 if __name__ == '__main__':
 	unittest.main()
