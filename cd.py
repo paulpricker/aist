@@ -40,9 +40,9 @@ class Test_CreateDonor(unittest.TestCase):
 		'''if driver.find_element_by_xpath('//*[@id="LastName"]').is_displayed() != True:
 			newdonor.click()'''
 		#Добавить TimeOut Exception
-		ln = "машинный"
-		fn = "яша"
-		mn = "афанасьевич"
+		ln = "Машинный"
+		fn = "Яша"
+		mn = "Афанасьевич"
 		global full_name 
 		full_name = ln + ' ' + fn + ' ' + mn
 		last = self.driver.find_element_by_xpath('//*[@id="LastName"]')
@@ -50,7 +50,20 @@ class Test_CreateDonor(unittest.TestCase):
 		middle = self.driver.find_element_by_id('MiddleName')
 		save_button = self.driver.find_element_by_id('NextStep')
 		save_button.click()
-		[@id='newdonor-popup-form']/div/div[1]/ul/li[1]
+		self.wait.until(EC.presence_of_element_located((By.XPATH, ".//*[@id='newdonor-popup-form']/div/div[1]/ul")))
+		self.validation_messages = ["Поле 'Фамилия' обязательно для заполнения", 
+		"Поле 'Имя' обязательно для заполнения", 
+		"Поле 'Дата рождения' обязательно для заполнения", 
+		"Поле 'Пол' обязательно для заполнения", 
+		"Поле 'Серия' обязательно для заполнения", 
+		"Поле 'Номер' обязательно для заполнения"]
+		self.validations = self.driver.find_element_by_xpath(".//*[@id='newdonor-popup-form']/div/div[1]/ul")
+		self.messages = self.validations.find_elements_by_tag_name("li")
+		self.count = 0
+		for message in self.messages:
+			self.assertEqual(message.text, self.validation_messages[self.count])
+			self.count = self.count + 1
+		
 		last.send_keys(ln)
 		first.send_keys(fn)
 		middle.send_keys(mn)
@@ -73,7 +86,7 @@ class Test_CreateDonor(unittest.TestCase):
 
 	def test_create_second_page(self):
 		self.wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='regFiasAddress_Region']")))
-		self.assertEqual(self.driver.find_element_by_xpath('//*[@id="step2"]/div[1]').text, "Контактная информация")
+		self.assertEqual(self.driver.find_element_by_xpath('//*[@id="step2"]/div[1]').text, "КОНТАКТНАЯ ИНФОРМАЦИЯ")
 		assert self.driver.find_element_by_xpath('//*[@id="regFiasAddress_Street"]').is_enabled() == False #get_attribute('disabled') == True
 		save_button = self.driver.find_element_by_xpath('//*[@id="save-newdonor"]')
 		#assert save_button.click()
